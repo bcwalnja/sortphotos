@@ -446,58 +446,71 @@ def sortPhotos(src_dir, dest_dir, sort_format, rename_format, recursive=False,
 def main():
     import argparse
 
-    # setup command line parsing
-    parser = argparse.ArgumentParser(formatter_class=argparse.RawTextHelpFormatter,
-                                     description='Sort files (primarily photos and videos) into folders by date\nusing EXIF and other metadata')
-    parser.add_argument('src_dir', type=str, help='source directory')
-    parser.add_argument('dest_dir', type=str, help='destination directory')
-    parser.add_argument('-r', '--recursive', action='store_true', help='search src_dir recursively')
-    parser.add_argument('-c', '--copy', action='store_true', help='copy files instead of move')
-    parser.add_argument('-s', '--silent', action='store_true', help='don\'t display parsing details.')
-    parser.add_argument('-t', '--test', action='store_true', help='run a test.  files will not be moved/copied\ninstead you will just a list of would happen')
-    parser.add_argument('--sort', type=str, default='%Y/%m-%b',
-                        help="choose destination folder structure using datetime format \n\
-    https://docs.python.org/2/library/datetime.html#strftime-and-strptime-behavior. \n\
-    Use forward slashes / to indicate subdirectory(ies) (independent of your OS convention). \n\
-    The default is '%%Y/%%m-%%b', which separates by year then month \n\
-    with both the month number and name (e.g., 2012/02-Feb).")
-    parser.add_argument('--rename', type=str, default=None,
-                        help="rename file using format codes \n\
-    https://docs.python.org/2/library/datetime.html#strftime-and-strptime-behavior. \n\
-    default is None which just uses original filename")
-    parser.add_argument('--keep-filename', action='store_true',
-                        help='In case of duplicated output filenames an increasing number and the original file name will be appended',
-                        default=False)
-    parser.add_argument('--keep-duplicates', action='store_true',
-                        help='If file is a duplicate keep it anyway (after renaming).')
-    parser.add_argument('--day-begins', type=int, default=0, help='hour of day that new day begins (0-23), \n\
-    defaults to 0 which corresponds to midnight.  Useful for grouping pictures with previous day.')
-    parser.add_argument('--ignore-groups', type=str, nargs='+',
-                    default=[],
-                    help='a list of tag groups that will be ignored for date informations.\n\
-    list of groups and tags here: http://www.sno.phy.queensu.ca/~phil/exiftool/TagNames/\n\
-    by default the group \'File\' is ignored which contains file timestamp data')
-    parser.add_argument('--ignore-tags', type=str, nargs='+',
-                    default=[],
-                    help='a list of tags that will be ignored for date informations.\n\
-    list of groups and tags here: http://www.sno.phy.queensu.ca/~phil/exiftool/TagNames/\n\
-    the full tag name needs to be included (e.g., EXIF:CreateDate)')
-    parser.add_argument('--use-only-groups', type=str, nargs='+',
-                    default=None,
-                    help='specify a restricted set of groups to search for date information\n\
-    e.g., EXIF')
-    parser.add_argument('--use-only-tags', type=str, nargs='+',
-                    default=None,
-                    help='specify a restricted set of tags to search for date information\n\
-    e.g., EXIF:CreateDate')
+    # # setup command line parsing
+    # parser = argparse.ArgumentParser(formatter_class=argparse.RawTextHelpFormatter,
+    #                                  description='Sort files (primarily photos and videos) into folders by date\nusing EXIF and other metadata')
+    # parser.add_argument('src_dir', type=str, help='source directory')
+    # parser.add_argument('dest_dir', type=str, help='destination directory')
+    # parser.add_argument('-r', '--recursive', action='store_true', help='search src_dir recursively')
+    # parser.add_argument('-c', '--copy', action='store_true', help='copy files instead of move')
+    # parser.add_argument('-s', '--silent', action='store_true', help='don\'t display parsing details.')
+    # parser.add_argument('-t', '--test', action='store_true', help='run a test.  files will not be moved/copied\ninstead you will just a list of would happen')
+    # parser.add_argument('--sort', type=str, default='%Y/%m-%b',
+    #                     help="choose destination folder structure using datetime format \n\
+    # https://docs.python.org/2/library/datetime.html#strftime-and-strptime-behavior. \n\
+    # Use forward slashes / to indicate subdirectory(ies) (independent of your OS convention). \n\
+    # The default is '%%Y/%%m-%%b', which separates by year then month \n\
+    # with both the month number and name (e.g., 2012/02-Feb).")
+    # parser.add_argument('--rename', type=str, default=None,
+    #                     help="rename file using format codes \n\
+    # https://docs.python.org/2/library/datetime.html#strftime-and-strptime-behavior. \n\
+    # default is None which just uses original filename")
+    # parser.add_argument('--keep-filename', action='store_true',
+    #                     help='In case of duplicated output filenames an increasing number and the original file name will be appended',
+    #                     default=False)
+    # parser.add_argument('--keep-duplicates', action='store_true',
+    #                     help='If file is a duplicate keep it anyway (after renaming).')
+    # parser.add_argument('--day-begins', type=int, default=0, help='hour of day that new day begins (0-23), \n\
+    # defaults to 0 which corresponds to midnight.  Useful for grouping pictures with previous day.')
+    # parser.add_argument('--ignore-groups', type=str, nargs='+',
+    #                 default=[],
+    #                 help='a list of tag groups that will be ignored for date informations.\n\
+    # list of groups and tags here: http://www.sno.phy.queensu.ca/~phil/exiftool/TagNames/\n\
+    # by default the group \'File\' is ignored which contains file timestamp data')
+    # parser.add_argument('--ignore-tags', type=str, nargs='+',
+    #                 default=[],
+    #                 help='a list of tags that will be ignored for date informations.\n\
+    # list of groups and tags here: http://www.sno.phy.queensu.ca/~phil/exiftool/TagNames/\n\
+    # the full tag name needs to be included (e.g., EXIF:CreateDate)')
+    # parser.add_argument('--use-only-groups', type=str, nargs='+',
+    #                 default=None,
+    #                 help='specify a restricted set of groups to search for date information\n\
+    # e.g., EXIF')
+    # parser.add_argument('--use-only-tags', type=str, nargs='+',
+    #                 default=None,
+    #                 help='specify a restricted set of tags to search for date information\n\
+    # e.g., EXIF:CreateDate')
 
-    # parse command line arguments
-    args = parser.parse_args()
+    # # parse command line arguments
+    # args = parser.parse_args()
 
-    sortPhotos(args.src_dir, args.dest_dir, args.sort, args.rename, args.recursive,
-        args.copy, args.test, not args.keep_duplicates, args.day_begins,
-        args.ignore_groups, args.ignore_tags, args.use_only_groups,
-        args.use_only_tags, not args.silent, args.keep_filename)
+    #python sortphotos.py -t -c -r D:\Users\bcwal\Pictures D:\Pictures
+
+    sortPhotos("D:\\Users\\bcwal\\Pictures", 
+        "D:\\Pictures", 
+        sort_format=None, 
+        rename_format=None, 
+        recursive=True,
+        copy_files=True, 
+        test=True, 
+        remove_duplicates=True, 
+        day_begins=0,
+        additional_groups_to_ignore=['File'], 
+        additional_tags_to_ignore=[],
+        use_only_groups=None, 
+        use_only_tags=None, 
+        verbose=True, 
+        keep_filename=False)
 
 if __name__ == '__main__':
     main()
